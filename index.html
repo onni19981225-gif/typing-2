@@ -13,6 +13,16 @@
             --wrong: #e74c3c;
             --text: #444;
             --key-base-width: 60px;
+            
+            /* 指法顏色 - 淺色調 */
+            --finger-l4: #FFD1DC; /* 左小指 */
+            --finger-l3: #FFECB3; /* 左無名 */
+            --finger-l2: #C8E6C9; /* 左中指 */
+            --finger-l1: #BBDEFB; /* 左食指 */
+            --finger-r1: #D1C4E9; /* 右食指 */
+            --finger-r2: #F8BBD0; /* 右中指 */
+            --finger-r3: #DCEDC8; /* 右無名 */
+            --finger-r4: #E0F2F1; /* 右小指 */
         }
 
         body {
@@ -116,16 +126,27 @@
 
         #input-box { font-size: 2.5rem; padding: 12px 30px; border-radius: 60px; border: 6px solid var(--primary); outline: none; text-align: center; width: 85%; max-width: 450px; background: white; font-family: inherit; }
 
-        #keyboard-area { display: none; text-align: center; width: 100%; max-width: 950px; }
-        .keyboard { display: flex; flex-direction: column; gap: 8px; background: #EEE; padding: 25px; border-radius: 25px; }
-        .kb-row { display: flex; gap: 10px; justify-content: center; }
+        #keyboard-area { display: none; text-align: center; width: 100%; max-width: 1000px; }
+        .keyboard { display: flex; flex-direction: column; gap: 8px; background: #ddd; padding: 15px; border-radius: 20px; border: 4px solid #bbb; }
+        .kb-row { display: flex; gap: 6px; justify-content: center; }
         .key {
-            width: var(--key-base-width); height: 60px; background: white; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 1.5rem; font-weight: bold;
-            border-bottom: 6px solid #ccc; position: relative;
+            width: 55px; height: 55px; background: white; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center; font-size: 1.4rem; font-weight: bold;
+            border-bottom: 5px solid #aaa; position: relative; transition: all 0.2s;
+            color: #555;
         }
-        .key.f-key::after, .key.j-key::after { content: ''; position: absolute; bottom: 12px; left: 50%; width: 22px; height: 4px; background: #ddd; transform: translateX(-50%); border-radius: 2px; }
-        .key.highlight { background: #FF4D4D !important; color: white; border-color: #B30000; transform: translateY(2px); border-bottom-width: 2px; }
+        .key.f-key::after, .key.j-key::after { content: ''; position: absolute; bottom: 10px; left: 50%; width: 18px; height: 3px; background: #999; transform: translateX(-50%); border-radius: 2px; }
+        
+        /* 亮紅 + 放大 + 發光 */
+        .key.highlight { 
+            background: #FF4D4D !important; 
+            color: white !important; 
+            border-color: #B30000; 
+            transform: scale(1.25); 
+            z-index: 10;
+            box-shadow: 0 0 20px rgba(255, 77, 77, 0.6);
+            border-bottom-width: 2px;
+        }
 
         #pre-game-start { text-align: center; background: white; padding: 40px; border-radius: 30px; border: 8px solid var(--accent); display: none; }
         
@@ -144,7 +165,6 @@
 
         input[type="number"] { font-family: inherit; border: 2px solid var(--primary); border-radius: 10px; padding: 5px; color: var(--primary); font-weight: bold; }
         
-        /* 考試模式結果區域 */
         #exam-results-box { width: 80%; max-width: 500px; background: #fff; border: 4px solid var(--accent); border-radius: 20px; padding: 15px; margin: 15px 0; text-align: left; }
         .error-item { margin-bottom: 10px; border-bottom: 1px dashed #ddd; padding-bottom: 5px; }
         .error-eng { color: var(--wrong); font-weight: bold; font-size: 1.4rem; }
@@ -246,7 +266,7 @@
             <div style="margin: 20px 0; font-size: 1.2rem; font-weight: bold; color: #666;">
                 設定練習次數：<input type="number" id="custom-repeat-count" value="1" min="1" style="width:70px; text-align:center; font-size: 1.2rem;">
             </div>
-            <button class="btn" onclick="launchCustomMode('practice')">📖 練習模式 </button>
+            <button class="btn" onclick="launchCustomMode('practice')">📖 一般練習 </button>
             <button class="btn" style="background: var(--accent); color: #855b3f; box-shadow: 0 4px 0 #e6c5ae;" onclick="launchCustomMode('test')">📝 測驗模式 </button>
             <button class="btn" style="background: #D2E8F7; color: #3B7FB9; box-shadow: 0 4px 0 #B2CDDE;" onclick="launchCustomMode('exam')">🎓 考試模式 </button>
             <button class="btn" style="background:#eee; margin-top:10px; color: #888; box-shadow: 0 4px 0 #ccc;" onclick="document.getElementById('mode-select-modal').style.display='none'">取消</button>
@@ -257,9 +277,7 @@
         <h1 style="font-size:6rem; margin:0;">🏁</h1>
         <h2 id="result-title" style="color: var(--primary); font-size: 2.5rem;">挑戰結束！</h2>
         <div id="result-detail" style="font-size:1.6rem; line-height:2; margin-bottom:10px; font-weight: bold; color: #555;"></div>
-        
         <div id="exam-results-box" style="display:none;"></div>
-
         <div style="display:flex; gap:15px; flex-wrap: wrap; justify-content: center;">
             <button class="btn" style="width:180px;" onclick="actualStartGame()">再挑戰一次</button>
             <button id="re-test-errors-btn" class="btn" style="width:180px; background: var(--accent); display:none;" onclick="startErrorReTest()">僅測驗錯題</button>
@@ -274,7 +292,25 @@
             normal: ["time", "minute", "hour", "o'clock", "watch", "clock", "morning", "noon", "afternoon", "evening", "night", "eve", "tonight", "day", "week", "month", "year", "yesterday", "today", "tomorrow", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday", "weekend", "january", "february", "march", "april", "may", "june", "july", "august", "september", "october", "november", "december", "build", "fix", "house", "apartment", "room", "bathroom", "restroom", "bedroom", "kitchen", "garden", "home", "floor", "ground", "door", "wall", "window", "lamp", "light", "bed", "bath", "towel", "chair", "sofa", "table", "desk", "machine", "telephone", "television", "tv", "computer", "fan", "piano", "radio", "fridge", "menu", "food", "meal", "breakfast", "lunch", "dinner", "noodles", "rice", "hamburger", "pie", "pizza", "sandwich", "meat", "beef", "chicken", "pork", "steak", "hot dog", "bread", "butter", "cheese", "egg", "ham", "salt", "sugar", "oil", "snack", "cake", "candy", "chocolate", "cookie", "ice cream", "popcorn", "fruit", "apple", "banana", "lemon", "orange", "tomato", "salad", "vegetable", "drink", "coffee", "juice", "milk", "soup", "tea", "water", "bottle", "bowl", "knife", "glass", "spoon", "school", "class", "classroom", "teacher", "playground", "student", "math", "ruler", "eraser", "pencil", "paper", "pen", "homework", "english"],
             hard: ["happen", "share", "helpful", "special", "dangerous", "difficult", "understand", "excellent", "successful", "popular", "interested", "exciting", "interesting", "oyster omelet", "stinky tofu", "pearl milk tea", "above", "below", "between", "beside", "behind", "outside", "inside", "arrive", "experience", "businessman", "fireman", "mailman", "kilogram", "shape", "triangle", "rectangle", "diamond", "halloween", "christmas", "decoration", "santa claus", "museum", "supermarket", "convenient store", "department store", "hospital", "medicine", "rainbow", "typhoon", "weather", "kangaroo", "koala", "airplane", "motorcycle", "railway", "sidewalk", "traffic", "internet", "postcard", "scooter", "mrt"]
         };
-        const kbLayout = [["Q","W","E","R","T","Y","U","I","O","P"],["A","S","D","F","G","H","J","K","L"],["Z","X","C","V","B","N","M"]];
+        
+        // 全鍵盤佈局定義
+        const kbRows = [
+            ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+            ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+            ["Z", "X", "C", "V", "B", "N", "M"]
+        ];
+
+        // 指法區域定義 (左手 L4..L1, 右手 R1..R4)
+        const fingerMap = {
+            "Q": "l4", "A": "l4", "Z": "l4",
+            "W": "l3", "S": "l3", "X": "l3",
+            "E": "l2", "D": "l2", "C": "l2",
+            "R": "l1", "F": "l1", "V": "l1", "T": "l1", "G": "l1", "B": "l1",
+            "Y": "r1", "H": "r1", "N": "r1", "U": "r1", "J": "r1", "M": "r1",
+            "I": "r2", "K": "r2",
+            "O": "r3", "L": "r3",
+            "P": "r4"
+        };
 
         let gameState = { 
             mode: '', 
@@ -336,24 +372,33 @@
         function prepareBeginnerMode() {
             toggleSidebar(); clearUI();
             gameState.mode = 'beginner';
-            gameState.timeLeft = 60; // 確實設定起始時間
+            gameState.timeLeft = 60; 
             document.getElementById('pre-title').innerText = "⌨️ 找字母挑戰";
-            document.getElementById('pre-desc').innerText = "看著螢幕上的紅字，按鍵盤練習吧！";
+            document.getElementById('pre-desc').innerText = "練習正確指法，亮紅色的按鍵要放大按下去喔！";
             document.getElementById('pre-game-start').style.display = 'block';
         }
+
         function initKeyboard() {
             const kb = document.getElementById('virtual-keyboard'); 
             kb.innerHTML = '';
-            kbLayout.forEach(row => {
+            kbRows.forEach(row => {
                 const rowDiv = document.createElement('div'); rowDiv.className = 'kb-row';
                 row.forEach(key => {
                     const kDiv = document.createElement('div'); 
                     kDiv.className = 'key' + (key === 'F' ? ' f-key' : '') + (key === 'J' ? ' j-key' : '');
-                    kDiv.id = `key-${key}`; kDiv.innerText = key; rowDiv.appendChild(kDiv);
+                    kDiv.id = `key-${key}`; 
+                    kDiv.innerText = key; 
+                    
+                    // 指法上色
+                    const finger = fingerMap[key];
+                    if(finger) kDiv.style.backgroundColor = `var(--finger-${finger})`;
+
+                    rowDiv.appendChild(kDiv);
                 });
                 kb.appendChild(rowDiv);
             });
         }
+
         function nextChar() {
             document.querySelectorAll('.key').forEach(k => k.classList.remove('highlight'));
             const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -370,6 +415,7 @@
             row.innerHTML = `<input type="text" class="eng-in" placeholder="英文"> <input type="text" class="chi-in" placeholder="中文"> <button onclick="this.parentElement.remove()" style="border:none; background:none; cursor:pointer; color:#999;">❌</button>`;
             container.appendChild(row);
         }
+
         function saveCustomList() {
             const name = document.getElementById('new-list-name').value.trim();
             if(!name) return alert("請輸入清單名稱！");
@@ -388,6 +434,7 @@
             renderSavedLists();
             alert("清單已儲存！");
         }
+
         function renderSavedLists() {
             const display = document.getElementById('saved-lists-display');
             display.innerHTML = "";
@@ -399,6 +446,7 @@
                 display.appendChild(item);
             }
         }
+
         function deleteList(e, name) {
             e.stopPropagation();
             if(confirm(`確定要刪除「${name}」嗎？`)) {
@@ -407,11 +455,13 @@
                 renderSavedLists();
             }
         }
+
         function openModeSelect(name) {
             gameState.activeListName = name;
             document.getElementById('selected-list-title').innerText = name;
             document.getElementById('mode-select-modal').style.display = 'flex';
         }
+
         function launchCustomMode(type) {
             const repeat = parseInt(document.getElementById('custom-repeat-count').value) || 1;
             const data = gameState.customData[gameState.activeListName];
@@ -441,32 +491,24 @@
             document.getElementById('pre-game-start').style.display = 'block';
         }
 
-        // 僅測驗錯題邏輯
         function startErrorReTest() {
-            const errorWords = [...new Set(gameState.examErrors)]; // 去重
-            const oldListName = gameState.activeListName;
-            
-            // 建立暫時清單
+            const errorWords = [...new Set(gameState.examErrors)];
             gameState.currentList = [];
-            errorWords.forEach(eng => {
-                gameState.currentList.push(eng);
-            });
-
+            errorWords.forEach(eng => gameState.currentList.push(eng));
             clearUI();
             gameState.mode = 'word';
             gameState.subMode = 'custom';
             gameState.testMode = true;
             gameState.examMode = true;
             gameState.examErrors = [];
-
             document.getElementById('pre-title').innerText = "🎓 錯題加強測驗";
-            document.getElementById('pre-desc').innerText = `針對剛才打錯的 ${errorWords.length} 個單字進行練習。`;
+            document.getElementById('pre-desc').innerText = `針對打錯的 ${errorWords.length} 個單字練習。`;
             document.getElementById('pre-game-start').style.display = 'block';
         }
 
         function clearUI() {
             gameState.active = false;
-            clearInterval(gameState.timer);
+            if(gameState.timer) clearInterval(gameState.timer);
             gameState.timer = null;
             document.getElementById('home-logo').style.display = 'none';
             document.getElementById('pre-game-start').style.display = 'none';
@@ -484,6 +526,10 @@
         function actualStartGame() {
             document.getElementById('pre-game-start').style.display = 'none';
             document.getElementById('result-layer').style.display = 'none';
+            
+            // 重要：啟動時立即刷新時間顯示，解決殘留問題
+            updateTimerDisplay();
+
             gameState.active = true;
             gameState.score = 0;
             gameState.currentIndex = 0;
@@ -491,8 +537,6 @@
                 document.getElementById('keyboard-area').style.display = 'block';
                 document.getElementById('timer-display').style.display = 'block';
                 document.getElementById('counter-display').style.display = 'block';
-                // 再次確保時間設定正確
-                if(gameState.timeLeft <= 0) gameState.timeLeft = 60;
                 initKeyboard(); nextChar(); startTimer();
             } else {
                 document.getElementById('word-area').style.display = 'block';
@@ -515,10 +559,16 @@
             if(gameState.timer) clearInterval(gameState.timer);
             gameState.timer = setInterval(() => {
                 gameState.timeLeft--;
-                const m = Math.floor(gameState.timeLeft / 60); const s = gameState.timeLeft % 60;
-                document.getElementById('timer-display').innerText = `時間：${m}:${s.toString().padStart(2, '0')}`;
+                updateTimerDisplay();
                 if (gameState.timeLeft <= 0) endGame();
             }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(gameState.timeLeft / 60); 
+            const s = gameState.timeLeft % 60;
+            const display = document.getElementById('timer-display');
+            display.innerText = `時間：${m}:${s.toString().padStart(2, '0')}`;
         }
 
         function renderWord() {
@@ -533,7 +583,6 @@
                         html += `<span>${word[i]}</span>`;
                     }
                 } else {
-                    // 考試模式下不顯示紅綠色即時反饋，除非按了 Enter
                     if(gameState.examMode) {
                         html += `<span style="color:#555;">${userIn[i]}</span>`;
                     } else {
@@ -558,10 +607,7 @@
         const inputObj = document.getElementById('input-box');
         inputObj.addEventListener('keydown', (e) => {
             if (gameState.mode !== 'word' || !gameState.active) return;
-            
-            // 考試模式允許自由刪改，不進行即時擋字
             if(gameState.examMode) return;
-
             const word = gameState.currentList[gameState.currentIndex] || "";
             const currentIn = inputObj.value;
             if (e.key === 'Backspace' || e.key === 'Enter') return;
@@ -576,23 +622,13 @@
             if (e.key === 'Enter' && gameState.mode === 'word' && gameState.active) {
                 const target = gameState.currentList[gameState.currentIndex]?.toLowerCase();
                 const userVal = inputObj.value.trim().toLowerCase();
-
-                // 考試模式：按下 Enter 檢查對錯
                 if(gameState.examMode) {
-                    if(userVal === target) {
-                        gameState.score++;
-                    } else {
-                        gameState.examErrors.push(gameState.currentList[gameState.currentIndex]);
-                    }
+                    if(userVal === target) gameState.score++;
+                    else gameState.examErrors.push(gameState.currentList[gameState.currentIndex]);
                     nextItem();
                 } else {
-                    // 練習/測驗模式：即時防錯
-                    if (userVal === target) {
-                        gameState.score++;
-                        nextItem();
-                    } else {
-                        playErrorSound();
-                    }
+                    if (userVal === target) { gameState.score++; nextItem(); }
+                    else playErrorSound();
                 }
             }
         });
@@ -617,7 +653,8 @@
         window.addEventListener('keydown', (e) => {
             if (!gameState.active || gameState.mode !== 'beginner' || e.target.tagName === 'INPUT') return;
             if (e.key.toUpperCase() === gameState.targetChar) {
-                gameState.score++; document.getElementById('counter-display').innerText = `得分：${gameState.score}`;
+                gameState.score++; 
+                document.getElementById('counter-display').innerText = `得分：${gameState.score}`;
                 nextChar();
             } else if (!['SHIFT','CONTROL','ALT','CAPSLOCK','TAB','META','ENTER'].includes(e.key.toUpperCase())) {
                 playErrorSound();
@@ -626,7 +663,7 @@
 
         function endGame() {
             gameState.active = false;
-            clearInterval(gameState.timer);
+            if(gameState.timer) clearInterval(gameState.timer);
             gameState.timer = null;
             const detail = document.getElementById('result-detail');
             const layer = document.getElementById('result-layer');
@@ -642,8 +679,6 @@
                 detail.innerHTML = `完成單字：${gameState.score} 個`;
             } else {
                 detail.innerHTML = `🎉 挑戰完成！<br>答對率：${Math.round(gameState.score / gameState.currentList.length * 100)}% (${gameState.score}/${gameState.currentList.length})`;
-                
-                // 考試模式專用結果分析
                 if(gameState.examMode && gameState.examErrors.length > 0) {
                     examBox.style.display = 'block';
                     reTestBtn.style.display = 'block';
@@ -665,7 +700,6 @@
             hideRandomModal(); toggleSidebar(); clearUI();
             gameState.mode = 'word'; gameState.subMode = 'random';
             gameState.timeLeft = mins * 60;
-            
             const titleMap = { easy: "🌱 簡單模式", normal: "🌿 基礎模式", hard: "🌳 困難模式" };
             document.getElementById('pre-title').innerText = titleMap[gameState.currentDifficulty];
             document.getElementById('pre-desc').innerText = `設定：${mins} 分鐘，準備好了嗎？`;
